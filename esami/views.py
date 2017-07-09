@@ -56,3 +56,35 @@ def insert_figura(request):
     except:
         traceback.print_exc()
     return render(request, 'esami/insert_figura.html', context=dic)
+
+
+def get_domande(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        domande = dao.get_domande()
+        dic['domande'] = domande
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/get_domande.html', context=dic)
+
+
+def get_domande_chiuse(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        domande_chiuse = dao.get_domande_chiuse()
+        dic['domande_chiuse'] = domande_chiuse
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/get_domande_chiuse.html', context=dic)
+
+def get_domande_aperte(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        domande_aperte = dao.get_domande_aperte()
+        dic['domande_aperte'] = domande_aperte
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/get_domande_aperte.html', context=dic)

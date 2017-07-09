@@ -35,6 +35,49 @@ class Figura:
         return self.descrizione
 
 
+class Domanda:
+    def __init__(self, id, testo, punteggio):
+        self.id = id
+        self.testo = testo
+        self.punteggio = punteggio
+
+
+    def get_id(self):
+        return self.id
+
+    def get_testo(self):
+        return self.testo
+
+    def get_punteggio(self):
+        return self.punteggio
+
+class DomandaChiusa(Domanda):
+    def __init__(self, id, testo, punteggio, figure, risposte):
+        self.id = id
+        self.testo = testo
+        self.punteggio = punteggio
+        self.figure=figure
+        self.risposte=risposte
+
+
+    def get_figure(self):
+        return self.figure
+
+    def get_risposte(self):
+        return self.risposte
+
+class DomandaAperta(Domanda):
+    def __init__(self, id, testo, punteggio, figure):
+        self.id = id
+        self.testo = testo
+        self.punteggio = punteggio
+        self.figure=figure
+
+
+    def get_figure(self):
+        return self.figure
+
+
 class Dao:
     import cx_Oracle
     try:
@@ -92,3 +135,33 @@ class Dao:
         except:
             traceback.print_exc()
             return "ERRORE!"
+
+    def get_domande(self):
+        cursor = self.con.cursor()
+        cursor.execute("select id, testo, punteggio from domanda order by id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(Domanda(row[0], row[1], row[2]))
+        cursor.close()
+        return to_return
+
+    def get_domande_chiuse(self):
+        cursor = self.con.cursor()
+        cursor.execute("select d.id, d.testo, d.punteggio, ff.figura.id, rr.risposte.testo from domanda d, table(d.figure) ff, table(d.risposte) rr where value(d) is of type (domanda_chiusaty) order by d.id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(DomandaChiusa(row[0], row[1], row[2], row[3], row[4]))
+        cursor.close()
+        return to_return
+
+    def get_domande_aperte(self):
+        cursor = self.con.cursor()
+        cursor.execute("select d.id, d.testo, d.punteggio, ff.figura.id from domanda d, table(d.figure) ff where value(d) is of type (domanda_apertaty) order by d.id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(DomandaAperta(row[0], row[1], row[2], row[3]))
+        cursor.close()
+        return to_return
