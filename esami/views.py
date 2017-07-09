@@ -88,3 +88,17 @@ def get_domande_aperte(request):
     except:
         traceback.print_exc()
     return render(request, 'esami/get_domande_aperte.html', context=dic)
+
+def insert_chiusa(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        if request.method == "POST":
+            testo = request.POST.get('testo')
+            punteggio = request.POST.get('punteggio')
+            figure = request.POST.get('figure')
+            risposte = request.POST.get('risposte')
+            dic['message'] = dao.insert_chiusa(testo, punteggio, figure, risposte)
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/insert_chiusa.html', context=dic)

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
-    <title>Domande</title>
-<style>
-        table {
+    <title>Inserisci Domanda Chiusa</title>
+    <style>
+       table {
         font-family: arial, sans-serif;
         border-collapse: collapse;
         width: 100%;
@@ -64,7 +64,9 @@
   background-color: #efefef;
   text-align: center;
 }
+
     </style>
+
 </head>
 <body>
 <div style="margin-bottom: 100px">
@@ -79,28 +81,29 @@
     </ul>
 </div>
 
-<div style="margin-bottom: 10px; margin-left: 10px">
-<button name="Chiuse" onclick="location.href='getChiuse'">Domande Chiuse</button>
-<button name="Aperte" onclick="location.href='getAperte'">Domande Aperte</button>
-</div>
 
-<div style="margin-bottom: 5px">
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Testo</th>
-            <th>Punteggio</th>
-        </tr>
-        {% for record in domande %}
-        <tr>
-            <td>{{record.get_id}}</td>
-            <td>{{record.get_testo}}</td>
-            <td>{{record.get_punteggio}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+<div id="theform" style="margin-bottom: 10px" align="center">
+    <form action="inserisciChiusa" method="post">
+        {% csrf_token %}
+        <p>Inserisci Testo<input type="text" id="testo" name="testo" value="{{testo}}"
+                                style="margin-left: 5px" required>
+          <p>Inserisci Punteggio<input type="number" min="0" max="30" id="punteggio" name="punteggio" value="{{punteggio}}"
+                                style="margin-left: 5px" required>
+        <p>Inserisci ID Figure. Ogni ID deve essere separato da uno spazio <input type="text" id="figure" name="figure" value="{{figure}}">
+        <p>Inserisci Risposte nel formato TestoXNumero. Numero può essere 0(non corretta) o 1(corretta). Es. svizzeraX1. Ogni Risposta deve essere separata da uno spazio <input type="text" id="risposte" name="risposte" value="{{risposte}}" required>
+            <input id="mybtn"
+                   type="submit"
+                   class="btn btn-success"
+                   value="Inserisci Chiusa"
+                   style="margin-left: 5px">
+        </p>
+    </form>
 </div>
-
+        <script>
+        {% if message %}
+    alert('{{ message }}');
+    {% endif %}
+</script>
 <footer class="w3-container w3-padding-64 w3-light-grey w3-center">
     <p>© 2017 by Gianni Mastroscianni</p>
     <p>Università degli Studi di Bari "Aldo Moro" - Dipartimento di Informatica </p>
