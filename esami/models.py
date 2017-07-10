@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import traceback
+from datetime import datetime as dt
 
 
 class Insegnamento:
@@ -75,6 +76,70 @@ class DomandaAperta(Domanda):
 
     def get_figure(self):
         return self.figure
+
+
+class Compito:
+    def __init__(self, id, docente, insegnamento, data, numDomande, domande):
+        self.id = id
+        self.docente = docente
+        self.insegnamento = insegnamento
+        self.data = data
+        self.numDomande = numDomande
+        self.domande = domande
+
+    def get_id(self):
+        return self.id
+
+    def get_docente(self):
+        return self.docente
+
+    def get_insegnamento(self):
+        return self.insegnamento
+
+    def get_data(self):
+        return self.data
+
+    def get_num_domande(self):
+        return self.numDomande
+
+    def get_domande(self):
+        return self.domande
+
+
+class Studente:
+    def __init__(self, matricola, cognome, numEsami):
+        self.matricola = matricola
+        self.cognome = cognome
+        self.numEsami = numEsami
+
+    def get_matricola(self):
+        return self.matricola
+
+    def get_cognome(self):
+        return self.cognome
+
+    def get_numEsami(self):
+        return self.numEsami
+
+
+class Esame:
+    def __init__(self, id, studente, compito, voto):
+        self.id = id
+        self.studente = studente
+        self.compito = compito
+        self.voto = voto
+
+    def get_id(self):
+        return self.id
+
+    def get_studente(self):
+        return self.studente
+
+    def get_compito(self):
+        return self.compito
+
+    def get_voto(self):
+        return self.voto
 
 
 class Dao:
@@ -225,3 +290,100 @@ class Dao:
             bool = True
         cursor.close()
         return bool
+
+    def insert_aperta(self, testo, punteggio, figure):
+        try:
+            cursor = self.con.cursor()
+            query = "insert into domanda select domanda_apertaty('" + testo + "', " + punteggio + ", ref_figurent(ref_figurety((select ref(f) from figura f where f.id="
+            figu = figure.split()
+            if len(figu) == 0:
+                query += "-1)))) from dual"
+            else:
+                query += "" + figure + ")))) from dual"
+            print query
+            cursor.execute(query)
+            cursor.close()
+            self.con.commit()
+            return "Domanda aperta inserita"
+        except:
+            traceback.print_exc()
+            return "ERRORE!"
+
+    def get_compiti(self):
+        cursor = self.con.cursor()
+        cursor.execute(
+            "select c.id, c.docente, deref(c.insegnamento).nome, c.data, c.num_domande, dd.domanda.testo from compito c, table(c.domande) dd order by c.id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            dat = row[3].strftime("%Y/%m/%d")
+            date = dt.strptime(dat, "%Y/%m/%d").timetuple()
+            d = (date[0], date[1], date[2])
+            to_return.append(Compito(row[0], row[1], row[2], d, row[4], row[5]))
+        cursor.close()
+        return to_return
+
+    def insert_compito(self, docente, insegnamento, data, numDomande, domande):
+        try:
+            cursor = self.con.cursor()
+            query = "insert into compito values(1, '" + docente + "', (select ref(i) from insegnamento i where i.nome='" + insegnamento + "'), to_date('" + data + "', 'yyyy-mm-dd'), " + numDomande + ", ref_domandent("
+            domande = domande.split()
+            for i in range(len(domande)):
+                sub_query = "ref_domandety((select ref(d) from domanda d where d.id = " + domande[i] + "))"
+                query += sub_query
+                if i != (len(domande) - 1):
+                    query += ","
+            query += "))"
+            cursor.execute(query)
+            cursor.close()
+            self.con.commit()
+            return "Compito inserito"
+        except:
+            traceback.print_exc()
+            return "ERRORE!"
+
+    def get_studenti(self):
+        cursor = self.con.cursor()
+        cursor.execute("select * from studente order by matricola")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(Studente(row[0], row[1], row[2]))
+        cursor.close()
+        return to_return
+
+    def insert_studente(self, matricola, cognome):
+        try:
+            cursor = self.con.cursor()
+            query = "insert into studente values(" + matricola + ", '" + cognome + "', 0)"
+            cursor.execute(query)
+            cursor.close()
+            self.con.commit()
+            return "Studente inserito"
+        except:
+            traceback.print_exc()
+            return "ERRORE!"
+
+    def get_esami(self):
+        cursor = self.con.cursor()
+        cursor.execute(
+            "select id, deref(studente).cognome, deref(compito).id, valutazione from esami_sostenuti order by id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(Esame(row[0], row[1], row[2], row[3]))
+        cursor.close()
+        return to_return
+
+    def insert_esame(self, studente, compito, voto):
+        try:
+            cursor = self.con.cursor()
+            query = "insert into esami_sostenuti values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), " + voto + ")"
+            print query
+            cursor.execute(query)
+            cursor.close()
+            self.con.commit()
+            return "Esame inserito"
+        except:
+            traceback.print_exc()
+            return "ERRORE!"

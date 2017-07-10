@@ -11,5 +11,12 @@ urlpatterns = [
     url(r'getChiuse', views.get_domande_chiuse, name='get_domande_chiuse'),
     url(r'getAperte', views.get_domande_aperte, name='get_domande_aperte'),
     url(r'inserisciChiusa', views.insert_chiusa, name='insert_chiusa'),
+    url(r'inserisciAperta', views.insert_aperta, name='insert_aperta'),
+    url(r'getCompiti', views.get_compiti, name='get_compiti'),
+    url(r'inserisciCompito', views.insert_compito, name='insert_compito'),
+    url(r'getStudenti', views.get_studenti, name='get_studenti'),
+    url(r'inserisciStudente', views.insert_studente, name='insert_studente'),
+    url(r'getEsami', views.get_esami, name='get_esami'),
+    url(r'inserisciEsame', views.insert_esame, name='insert_esame'),
 
 ]
