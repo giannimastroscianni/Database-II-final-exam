@@ -433,7 +433,9 @@ class Dao:
                 _insert_risposta_aperta(aperta)
                 query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.testo='" + aperta + "'), null)"
             else:
-                query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.id=" + chiusa + "), null)"
+               # if(_check_tipo_risposta(chiusa)=='risposta_aperta'):
+                #    return "ERRORE! Inserire risposta chiusa per una domanda chiusa"
+                query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select treat(ref(d) as ref domanda_chiusaty) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.id=" + chiusa + "), null)"
             print query
             cursor.execute(query)
             cursor.close()
@@ -486,4 +488,16 @@ def _insert_risposta_aperta(risp):
     cursor.execute(query)
     cursor.close()
     dao.con.commit()
+
+def _check_tipo_risposta(risp):
+    dao=Dao()
+    cursor = dao.con.cursor()
+    query = "select tipo from risposta where testo='" + str(risp)+"'"
+    print query
+    cursor.execute(query)
+    row=cursor.fetchone()
+    to_return=row[0]
+    cursor.close()
+    return to_return
+
 
