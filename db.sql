@@ -1,4 +1,3 @@
--- DA RISOLVERE: I CAMPI CHE SETTO NEL COSTRUTTORE, NON DEVO METTERLI QUANDO INSERISCO. TOGLIERE IL REF DI FIGURA A DOMANDA APERTA
 -- DROP
 drop trigger compito_incr;
 drop trigger domanda_incr;
@@ -22,6 +21,8 @@ drop trigger check_duplicati_nt_domande;
 drop trigger check_duplicati_nt_figure;
 drop trigger check_duplicati_nt_compito;
 drop trigger check_unique_prova;
+drop trigger check_domande_prova;
+drop trigger check_risposte_prova;
 
 drop table insegnamento;
 drop table figura;
@@ -575,6 +576,57 @@ begin
 end;
 /
 
+create or replace trigger check_domande_prova
+before insert on prova
+for each row
+declare
+    iddom domanda.id%type;
+    idcomp compito.id%type;
+    doms ref_domandent;
+    dom domanda.id%type;
+    bool number(1);
+    pragma autonomous_transaction;
+begin
+    bool :=0;
+    select deref(:new.compito).id, deref(:new.domanda).id into idcomp, iddom from dual;
+    select c.domande into doms from compito c where c.id=idcomp;
+    for i in doms.first..doms.last loop
+        select deref(doms(i).domanda).id into dom from dual;
+        if (dom=iddom) then
+            bool := 1;
+        end if;
+    end loop;
+    if (bool = 0) then
+        raise_application_error(-20019, 'La domanda non è presente in questo compito');
+    end if;
+end;
+/
+create or replace trigger check_risposte_prova
+before insert on prova
+for each row
+declare
+    iddom domanda.id%type;
+    idrisp risposta.id%type;
+    risps ref_rispostent;
+    risp risposta.id%type;
+    bool number(1);
+    pragma autonomous_transaction;
+begin
+    bool :=0;
+    select deref(:new.risposta).id, deref(:new.domanda).id into idrisp, iddom from dual;
+    select c.risposte into risps from domanda c where c.id=iddom;
+    for i in risps.first..risps.last loop
+        select deref(risps(i).risposte).id into risp from dual;
+        if (risp=idrisp) then
+            bool := 1;
+        end if;
+    end loop;
+    if (bool = 0) then
+        raise_application_error(-20020, 'La risposta non è possibile per questa domanda');
+    end if;
+end;
+/
+
 -- QUERY
 insert into insegnamento values(1,'basi di dati',0,0);
 insert into insegnamento values(2,'programmazione 2',0,0);
@@ -646,4 +698,4 @@ insert into prova values(1, (select ref(s) from studente s where s.matricola=2),
 /
 
 -- QUERY INDICE
-select id, deref(studente).cognome, deref(deref(compito).insegnamento).nome, valutazione from esami_sostenuti where deref(studente).cognome='mastroscianni';  
+select id, deref(studente).cognome, deref(deref(compito).insegnamento).nome, valutazione from esami_sostenuti where deref(studente).id=1;  
