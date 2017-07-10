@@ -286,7 +286,7 @@ class Dao:
                         query += ","
                 query += "), "
             else:
-                query += "ref_figurety((select ref(f) from figura f where f.id=1))),"
+                query += "ref_figurety((select ref(f) from figura f where f.id=-1))),"
             query += "ref_rispostent("
             risposte = risposte.split()
             for j in range(len(risposte)):
@@ -295,7 +295,7 @@ class Dao:
                 punt = risposte[j][pos + 1:]
                 new_sub_query = "ref_rispostety((select treat(ref(r) as ref risposta_chiusaty) from risposta r where r.testo='" + testo + "')," + punt + ")"
                 query += new_sub_query
-                if j != (len(risp) - 1):
+                if j != (len(risposte) - 1):
                     query += ","
 
             query += "))from dual"

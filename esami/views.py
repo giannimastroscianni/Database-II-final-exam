@@ -189,7 +189,7 @@ def insert_esame(request):
     try:
         dao = models.Dao()
         studenti = dao.get_studenti()
-        compiti = dao.get_compiti()
+        compiti = dao.get_distinct_compiti()
         dic['studenti'] = studenti
         dic['compiti'] = compiti
         if request.method == "POST":

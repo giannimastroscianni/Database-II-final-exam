@@ -94,7 +94,7 @@
             </select>
         <p> Inserisci ID Compito <select name="compito" id="compito" value="{{compito}}" required>
                 {% for record in compiti %}
-                <option>{{record.get_id}}</option>
+                <option>{{record}}</option>
                 {% endfor %}
             </select>
         <p>Inserisci Voto<input type="number" min="0" max="30" id="voto" name="voto" value="{{voto}}"

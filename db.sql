@@ -362,7 +362,7 @@ begin
 end;
 /
 create or replace trigger check_prova
-before insert on prova
+before update on prova
 for each row
 declare
     new_row provaty;
@@ -698,4 +698,4 @@ insert into prova values(1, (select ref(s) from studente s where s.matricola=2),
 /
 
 -- QUERY INDICE
-select id, deref(studente).cognome, deref(deref(compito).insegnamento).nome, valutazione from esami_sostenuti where deref(studente).id=1;  
+select id, deref(studente).cognome, deref(deref(compito).insegnamento).nome, valutazione from esami_sostenuti where deref(studente).matricola=1;  
