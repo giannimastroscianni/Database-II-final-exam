@@ -142,6 +142,34 @@ class Esame:
         return self.voto
 
 
+class Prova:
+    def __init__(self, id, studente, compito, domanda, risposta, valutazione):
+        self.id = id
+        self.studente = studente
+        self.compito = compito
+        self.domanda = domanda
+        self.risposta = risposta
+        self.valutazione = valutazione
+
+    def get_id(self):
+        return self.id
+
+    def get_studente(self):
+        return self.studente
+
+    def get_compito(self):
+        return self.compito
+
+    def get_domanda(self):
+        return self.domanda
+
+    def get_risposta(self):
+        return self.risposta
+
+    def get_valutazione(self):
+        return self.valutazione
+
+
 class Dao:
     import cx_Oracle
     try:
@@ -379,6 +407,29 @@ class Dao:
         try:
             cursor = self.con.cursor()
             query = "insert into esami_sostenuti values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), " + voto + ")"
+            cursor.execute(query)
+            cursor.close()
+            self.con.commit()
+            return "Esame inserito"
+        except:
+            traceback.print_exc()
+            return "ERRORE!"
+
+    def get_prove(self):
+        cursor = self.con.cursor()
+        cursor.execute(
+            "select id, deref(studente).cognome, deref(compito).id, deref(domanda).testo, deref(risposta).testo, valutazione from prova order by id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(Prova(row[0], row[1], row[2], row[3], row[4], row[5]))
+        cursor.close()
+        return to_return
+
+    def insert_prova(self, studente, compito, domanda, risposta):
+        try:
+            cursor = self.con.cursor()
+            query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.testo='" + domanda + "'), (select ref(r) from risposta r where r.testo='"+risposta+"'), null)"
             print query
             cursor.execute(query)
             cursor.close()

@@ -18,5 +18,7 @@ urlpatterns = [
     url(r'inserisciStudente', views.insert_studente, name='insert_studente'),
     url(r'getEsami', views.get_esami, name='get_esami'),
     url(r'inserisciEsame', views.insert_esame, name='insert_esame'),
+    url(r'getProve', views.get_prove, name='get_prove'),
+    url(r'inserisciProva', views.insert_prova, name='insert_prova'),
 
 ]

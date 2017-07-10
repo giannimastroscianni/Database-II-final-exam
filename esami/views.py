@@ -200,3 +200,13 @@ def insert_esame(request):
     except:
         traceback.print_exc()
     return render(request, 'esami/insert_esame.html', context=dic)
+
+def get_prove(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        prove = dao.get_prove()
+        dic['prove'] = prove
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/get_prove.html', context=dic)
