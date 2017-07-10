@@ -95,19 +95,18 @@
         </select>
         <p> Inserisci ID Compito <select name="compito" id="compito" value="{{compito}}" required>
             {% for record in compiti %}
-            <option>{{record.get_id}}</option>
+            <option>{{record}}</option>
             {% endfor %}
         </select>
-        <p> Inserisci Domanda <select name="domanda" id="domanda" value="{{domanda}}" required>
-            {% for record in domande %}
-            <option>{{record.get_testo}}</option>
-            {% endfor %}
-        </select>
-        <p> Inserisci Risposta <select name="risposta" id="risposta" value="{{risposta}}" required>
-            {% for record in risposte %}
-            <option>{{record.get_testo}}</option>
-            {% endfor %}
-        </select>
+
+        <p>Inserisci ID Domanda<input type="number" min="0" id="domanda" name="domanda" value="{{domanda}}"
+                                style="margin-left: 5px" required>
+        <p>Inserisci ID Risposta se la domanda è chiusa<input type="number" min="0" id="chiusa" name="chiusa" value="{{chiusa}}"
+                                style="margin-left: 5px" >
+
+        <p>Inserisci Testo Risposta la domanda è aperta<input type="text" id="aperta" name="aperta" value="{{aperta}}"
+                                style="margin-left: 5px" >
+
         <p><input id="mybtn"
                   type="submit"
                   class="btn btn-success"

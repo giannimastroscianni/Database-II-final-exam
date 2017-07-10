@@ -261,7 +261,7 @@ class Dao:
         return to_return
 
     def insert_chiusa(self, testo, punteggio, figure, risposte):
-        risp = risposte.split()
+        risp = risposte.split(',')
         for i in range(len(risp)):
             pos = risp[i].index('X')
             text = risp[i][:pos]
@@ -426,15 +426,64 @@ class Dao:
         cursor.close()
         return to_return
 
-    def insert_prova(self, studente, compito, domanda, risposta):
+    def insert_prova(self, studente, compito, domanda, chiusa, aperta):
         try:
             cursor = self.con.cursor()
-            query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.testo='" + domanda + "'), (select ref(r) from risposta r where r.testo='"+risposta+"'), null)"
+            if aperta:
+                _insert_risposta_aperta(aperta)
+                query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.testo='" + aperta + "'), null)"
+            else:
+                query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.id=" + chiusa + "), null)"
             print query
             cursor.execute(query)
             cursor.close()
             self.con.commit()
-            return "Esame inserito"
+            return "Prova inserita"
         except:
             traceback.print_exc()
             return "ERRORE!"
+
+    def valuta_prova(self, id, voto):
+        try:
+            cursor = self.con.cursor()
+            query = "update prova set valutazione=" + voto + " where id=" + id
+            cursor.execute(query)
+            cursor.close()
+            self.con.commit()
+            return "Valutazione inserita"
+        except:
+            traceback.print_exc()
+            return "ERRORE!"
+
+    def get_distinct_compiti(self):
+        cursor = self.con.cursor()
+        cursor.execute(
+            "select id from compito order by id")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(row[0])
+        cursor.close()
+        return to_return
+
+    def get_prove_da_valutare(self):
+        cursor = self.con.cursor()
+        cursor.execute(
+            "select id from prova where deref(prova.domanda).tipo='domanda_aperta'")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(row[0])
+        cursor.close()
+        return to_return
+
+
+def _insert_risposta_aperta(risp):
+    dao = Dao()
+    cursor = dao.con.cursor()
+    query = "insert into risposta select risposta_apertaty('" + risp + "') from dual"
+    print query
+    cursor.execute(query)
+    cursor.close()
+    dao.con.commit()
+

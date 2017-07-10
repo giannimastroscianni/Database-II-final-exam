@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'inserisciEsame', views.insert_esame, name='insert_esame'),
     url(r'getProve', views.get_prove, name='get_prove'),
     url(r'inserisciProva', views.insert_prova, name='insert_prova'),
-
+    url(r'valutaProva', views.valuta_prova, name='valuta_prova'),
 ]

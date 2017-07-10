@@ -201,6 +201,7 @@ def insert_esame(request):
         traceback.print_exc()
     return render(request, 'esami/insert_esame.html', context=dic)
 
+
 def get_prove(request):
     dic = {}
     try:
@@ -210,3 +211,94 @@ def get_prove(request):
     except:
         traceback.print_exc()
     return render(request, 'esami/get_prove.html', context=dic)
+
+
+def insert_prova(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        studenti = dao.get_studenti()
+        compiti = dao.get_distinct_compiti()
+        dic['studenti'] = studenti
+        dic['compiti'] = compiti
+        if request.method == "POST":
+            studente = request.POST.get('studente')
+            compito = request.POST.get('compito')
+            domanda = request.POST.get('domanda')
+            chiusa = request.POST.get('chiusa')
+            aperta = request.POST.get('aperta')
+            dic['message'] = dao.insert_prova(studente, compito, domanda, chiusa, aperta)
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/insert_prova.html', context=dic)
+
+
+def valuta_prova(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        prove = dao.get_prove_da_valutare()
+        dic['prove'] = prove
+        if request.method == "POST":
+            id = request.POST.get('id')
+            voto = request.POST.get('voto')
+            dic['message'] = dao.valuta_prova(id, voto)
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/valuta_prova.html', context=dic)
+
+
+def insert_compito_prova(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        studenti = dao.get_studenti()
+        compiti = dao.get_distinct_compiti()
+        dic['studenti'] = studenti
+        dic['compiti'] = compiti
+        # dic['domande'] = dao.get_domande()
+        # if request.method == "POST":
+        # studente = request.POST.get('studente')
+        # compito = request.POST.get('compito')
+        # dic['domande'] = dao._get_dom(compito)
+        # voto = request.POST.get('voto')
+        # dic['message'] = dao.insert_esame(studente, compito, voto)
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/insert_compito_prova.html', context=dic)
+
+
+def insert_domanda_prova(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        if request.method == 'POST':
+            compito = request.POST.get('compito')
+            dic['compito'] = compito
+            studente = request.POST.get('studente')
+            dic['studente'] = studente
+            domande = dao.get_domande_compito(compito)
+            dic['domande'] = domande
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/insert_domanda_prova.html', context=dic)
+
+
+def insert_risposta_prova(request):
+    dic = {}
+    try:
+        dao = models.Dao()
+        if request.method == 'POST':
+            studente = request.POST.get('studente')
+            dic['studente'] = studente
+            compito = request.POST.get('compito')
+            dic['compito'] = compito
+            domanda = request.POST.get('domanda')
+            dic['domanda'] = domanda
+            risposte = dao.get_risposte_domanda(domanda)
+            dic['risposte'] = risposte
+            risposta = request.POST.get('risposta')
+            dic['message'] = dao.insert_prova(studente, compito, domanda, risposta)
+    except:
+        traceback.print_exc()
+    return render(request, 'esami/insert_risposta_prova.html', context=dic)
