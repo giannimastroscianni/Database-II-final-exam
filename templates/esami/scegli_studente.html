@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
-    <title>Inserisci Prova</title>
-    <style>
-       table {
+    <title>Studenti</title>
+<style>
+        table {
         font-family: arial, sans-serif;
         border-collapse: collapse;
         width: 100%;
@@ -55,7 +55,7 @@
         background-color: #4CAF50;
     }
 
-    footer {
+   footer {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -64,11 +64,7 @@
   background-color: #efefef;
   text-align: center;
 }
-
-
-
     </style>
-
 </head>
 <body>
 <div style="margin-bottom: 100px">
@@ -78,39 +74,29 @@
         <li><a href="getFigure">Figure</a></li>
         <li><a href="getDom">Domande</a></li>
         <li><a href="getCompiti">Compiti</a></li>
-        <li><a href="getStudenti">Studenti</a></li>
+        <li><a class="active" href="getStudenti">Studenti</a></li>
         <li><a href="getEsami">Esami</a></li>
-        <li><a class="active" href="getProve">Prove</a></li>
+        <li><a href="getProve">Prove</a></li>
     </ul>
 </div>
-{{studente}}
 
 <div id="theform" style="margin-bottom: 10px" align="center">
-    <form action="inserisciRispostaProva" method="post">
+    <form action="vediEsami" method="post">
         {% csrf_token %}
-        <input type='hidden' name='compito' value='{{compito}}'>
-        <input type='hidden' name='studente' value='{{studente}}'>
-        <p> Inserisci domanda per il compito con id {{compito}} <select name="domanda" id="domanda" value="{{domanda}}" required>
-            {% for record in domande %}
-            <option>{{record}}</option>
-            {% endfor %}
-        </select>
-
-        <p><input id="mybtn2"
-                  type="submit"
-                  class="btn btn-success"
-                  value="Inserisci Domanda Prova"
-                  style="margin-left: 5px">
+         <p> Scegli Studente <select name="studente" id="studente" value="{{studente}}" required>
+                {% for record in studenti %}
+                <option>{{record.get_cognome}}</option>
+                {% endfor %}
+            </select>
+         <p>   <input id="mybtn"
+                   type="submit"
+                   class="btn btn-success"
+                   value="Scegli Studente"
+                   style="margin-left: 5px">
         </p>
     </form>
 </div>
-<script>
-        {% if message %}
-    alert('{{ message }}');
-    {% endif %}
 
-
-</script>
 <footer class="w3-container w3-padding-64 w3-light-grey w3-center">
     <p>© 2017 by Gianni Mastroscianni</p>
     <p>Università degli Studi di Bari "Aldo Moro" - Dipartimento di Informatica </p>

@@ -20,9 +20,10 @@ drop trigger check_nt_compito;
 drop trigger check_duplicati_nt_domande;
 drop trigger check_duplicati_nt_figure;
 drop trigger check_duplicati_nt_compito;
-drop trigger check_unique_prova;
+drop trigger checkuniqueprova;
 drop trigger check_domande_prova;
 drop trigger check_risposte_prova;
+drop trigger checkuniqueesame;
 
 drop table insegnamento;
 drop table figura;
@@ -623,6 +624,19 @@ begin
     end loop;
     if (bool = 0) then
         raise_application_error(-20020, 'La risposta non è possibile per questa domanda');
+    end if;
+end;
+/
+create or replace trigger checkuniqueesame
+before insert on esami_sostenuti
+for each row
+declare
+    numesami number;
+    pragma autonomous_transaction;
+begin
+    select count(*) into numesami from esami_sostenuti where studente = :new.studente and compito = :new.compito;
+    if (numesami > 0) then
+    raise_application_error(-20021, 'Stai inserendo un esame già esistente');
     end if;
 end;
 /

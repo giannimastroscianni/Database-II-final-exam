@@ -433,7 +433,7 @@ class Dao:
                 _insert_risposta_aperta(aperta)
                 query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.testo='" + aperta + "'), null)"
             else:
-               # if(_check_tipo_risposta(chiusa)=='risposta_aperta'):
+                # if(_check_tipo_risposta(chiusa)=='risposta_aperta'):
                 #    return "ERRORE! Inserire risposta chiusa per una domanda chiusa"
                 query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select treat(ref(d) as ref domanda_chiusaty) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.id=" + chiusa + "), null)"
             print query
@@ -479,6 +479,17 @@ class Dao:
         cursor.close()
         return to_return
 
+    def vedi_esami(self, stud):
+        cursor = self.con.cursor()
+        cursor.execute(
+            "select e.id, deref(deref(e.compito).insegnamento).nome, e.valutazione from esami_sostenuti e where deref(e.studente).cognome='" + stud + "'")
+        rows = cursor.fetchall()
+        to_return = []
+        for row in rows:
+            to_return.append(Esame(row[0], stud, row[1], row[2]))
+        cursor.close()
+        return to_return
+
 
 def _insert_risposta_aperta(risp):
     dao = Dao()
@@ -489,15 +500,14 @@ def _insert_risposta_aperta(risp):
     cursor.close()
     dao.con.commit()
 
+
 def _check_tipo_risposta(risp):
-    dao=Dao()
+    dao = Dao()
     cursor = dao.con.cursor()
-    query = "select tipo from risposta where testo='" + str(risp)+"'"
+    query = "select tipo from risposta where testo='" + str(risp) + "'"
     print query
     cursor.execute(query)
-    row=cursor.fetchone()
-    to_return=row[0]
+    row = cursor.fetchone()
+    to_return = row[0]
     cursor.close()
     return to_return
-
-
