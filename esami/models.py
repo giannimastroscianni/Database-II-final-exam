@@ -241,11 +241,12 @@ class Dao:
     def get_domande_chiuse(self):
         cursor = self.con.cursor()
         cursor.execute(
-            "select d.id, d.testo, d.punteggio, ff.figura.id, rr.risposte.testo from domanda d, table(d.figure) ff, table(d.risposte) rr where value(d) is of type (domanda_chiusaty) order by d.id")
+            "select d.id, d.testo, d.punteggio, ff.figura.id, rr.risposte.testo, rr.corretta from domanda d, table(d.figure) ff, table(d.risposte) rr where value(d) is of type (domanda_chiusaty) order by d.id")
         rows = cursor.fetchall()
         to_return = []
         for row in rows:
-            to_return.append(DomandaChiusa(row[0], row[1], row[2], row[3], row[4]))
+            ris = row[4] + ", corretta=" + str(row[5])
+            to_return.append(DomandaChiusa(row[0], row[1], row[2], row[3], ris))
         cursor.close()
         return to_return
 
