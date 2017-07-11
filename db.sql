@@ -640,6 +640,35 @@ begin
     end if;
 end;
 /
+create or replace trigger check_ref_nt_domanda
+before insert on domanda
+for each row
+when (new.tipo='domanda_chiusa')
+declare
+    risp risposta.id%type;
+begin
+    for i in :new.risposte.first..:new.risposte.last loop
+        select deref(:new.risposte(i).risposte).id into risp from dual;
+        if (risp is null) then
+            raise_application_error(-20022, 'Stai inserendo una risposta non esistente');
+        end if;
+    end loop;
+end;
+/
+create or replace trigger check_ref_nt_compito
+before insert on compito
+for each row
+declare
+    dom domanda.id%type;
+begin
+    for i in :new.domande.first..:new.domande.last loop
+        select deref(:new.domande(i).domanda).id into dom from dual;
+        if (dom is null) then
+            raise_application_error(-20024, 'Stai inserendo una domanda non esistente');
+        end if;
+    end loop;
+end;
+/
 
 -- QUERY
 insert into insegnamento values(1,'basi di dati',0,0);
