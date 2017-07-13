@@ -267,14 +267,8 @@ class Dao:
             pos = risp[i].index('X')
             text = risp[i][:pos]
             if not self._check_esiste_risposta(text):
-                try:
-                    cursor = self.con.cursor()
-                    query = "insert into risposta select risposta_chiusaty('" + text + "') from dual"
-                    cursor.execute(query)
-                    cursor.close()
-                    self.con.commit()
-                except:
-                    traceback.print_exc()
+                _insert_risp(text)
+
         try:
             cursor = self.con.cursor()
             query = "insert into domanda select domanda_chiusaty('" + testo + "', " + punteggio + ", ref_figurent("
@@ -289,14 +283,16 @@ class Dao:
             else:
                 query += "ref_figurety((select ref(f) from figura f where f.id=-1))),"
             query += "ref_rispostent("
-            risposte = risposte.split()
-            for j in range(len(risposte)):
-                pos = risposte[j].index('X')
-                testo = risposte[j][:pos]
-                punt = risposte[j][pos + 1:]
-                new_sub_query = "ref_rispostety((select treat(ref(r) as ref risposta_chiusaty) from risposta r where r.testo='" + testo + "')," + punt + ")"
+            print risp
+            for j in range(len(risp)):
+                pos = risp[j].index('X')
+                testo = risp[j][:pos]
+                print testo
+                punt = risp[j][pos + 1:]
+                print punt
+                new_sub_query = "ref_rispostety((select treat(ref(r) as ref risposta_chiusaty) from risposta r where r.testo='" + testo + "' and value(r) is of type(risposta_chiusaty))," + punt + ")"
                 query += new_sub_query
-                if j != (len(risposte) - 1):
+                if j != (len(risp) - 1):
                     query += ","
 
             query += "))from dual"
@@ -312,7 +308,7 @@ class Dao:
     def _check_esiste_risposta(self, text):
         bool = False;
         cursor = self.con.cursor()
-        query = "select * from risposta r where r.testo='" + text + "'"
+        query = "select * from risposta r where r.testo='" + text + "' and value(r) is of type(risposta_chiusaty)"
         cursor.execute(query)
         rows = cursor.fetchall()
         if len(rows) > 0:
@@ -434,8 +430,6 @@ class Dao:
                 _insert_risposta_aperta(aperta)
                 query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select ref(d) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.testo='" + aperta + "'), null)"
             else:
-                # if(_check_tipo_risposta(chiusa)=='risposta_aperta'):
-                #    return "ERRORE! Inserire risposta chiusa per una domanda chiusa"
                 query = "insert into prova values(1, (select ref(s) from studente s where s.cognome='" + studente + "'), (select ref(c) from compito c where c.id=" + compito + "), (select treat(ref(d) as ref domanda_chiusaty) from domanda d where d.id=" + domanda + "), (select ref(r) from risposta r where r.id=" + chiusa + "), null)"
             print query
             cursor.execute(query)
@@ -512,3 +506,15 @@ def _check_tipo_risposta(risp):
     to_return = row[0]
     cursor.close()
     return to_return
+
+
+def _insert_risp(text):
+    try:
+        dao = Dao()
+        cursor = dao.con.cursor()
+        query = "insert into risposta select risposta_chiusaty('" + text + "') from dual"
+        cursor.execute(query)
+        cursor.close()
+        self.con.commit()
+    except:
+        traceback.print_exc()
